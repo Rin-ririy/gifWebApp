@@ -1,0 +1,27 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.search {
+  margin-bottom: 3rem;
+  /* background-color: aqua; */
+}
+
+.list {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  list-style: none;
+}
+
+.item {
+  width: 10%;
+}
+
+.image {
+  width: 100%;
+}

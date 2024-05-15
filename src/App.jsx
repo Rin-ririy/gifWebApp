@@ -1,67 +1,77 @@
 import "./App.css";
-import axios from "axios";
+import React, { useCallback, useRef } from "react";
 import { useState, useEffect } from "react";
 import Search from "./components/Search";
 
 const App = () => {
-  //
-  const [gifUrlList, setGifUrlList] = useState([]);
+  const [words, setWords] = useState("");
+  const [query, setQuery] = useState("");
+  const [pageNumber, setPageNumber] = useState(1);
+  const { anyList, loading, error, hasMore } = Search(words, pageNumber);
 
-  //
-  const gipyhApi = async (target) => {
-    //
-    const search = target;
-    const key = "hyc4fqYBLNEjtiPLEMjY7AeXA3SWNveD";
-    // const key = "1EzXlc67euxMFXaQjhwBRBYGZiC8h7KK";
-    const limit = 100;
-    const url = `https://api.giphy.com/v1/gifs/search?q=${search}&api_key=${key}&limit=${limit}`;
+  const observer = useRef();
+  const lastElementRef = useCallback(
+    (node) => {
+      if (loading) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPageNumber((prevPageNumber) => prevPageNumber + 1);
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore]
+  );
 
-    //
-    await axios.get(url).then((res) => {
-      const data = res.data.data;
-      const imageUrlList = data.map((item) => item.images.downsized.url);
-      setGifUrlList({ gifUrlList: imageUrlList });
-    });
+  // 追記
+  const getText = () => {};
+  // ここまで
+
+  const handleSubmit = (e) => {
+    getText();
+    setWords(query);
+    setPageNumber(1);
+    setQuery("");
   };
 
-  //
-  // useEffect(() => {
-  //   gipyhApi();
-  // }, []);
-
-  // console.log(gifUrlList);
-
-  // マウント　時,依存配列の中身が変わった
-
-  //
-  const renderImageList = (list) => {
-    // console.log(list);
-    return (
+  return (
+    <>
+      <div className="search">
+        <h2>Find your GIF!</h2>
+        <input
+          type="text"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+        />
+        <button
+          onClick={() => {
+            handleSubmit();
+          }}
+        >
+          Search
+        </button>
+      </div>
       <ul className="list">
-        {list.gifUrlList.map((url) => {
-          return (
-            <li className="item">
-              <img src={url} alt="" className="image" />
-            </li>
-          );
+        {anyList.map((url, i) => {
+          if (anyList.length === i + 1) {
+            return (
+              <li ref={lastElementRef} className="item" key={i}>
+                <img src={url} alt="" className="image" />
+              </li>
+            );
+          } else {
+            return (
+              <li className="item" key={i}>
+                <img src={url} alt="" className="image" />
+              </li>
+            );
+          }
         })}
       </ul>
-    );
-  };
-
-  if (gifUrlList.length === 0) {
-    return (
-      <div>
-        <Search search={gipyhApi} />
-      </div>
-    );
-  }
-  // console.log(gifUrlList);
-  return (
-    <div>
-      <Search search={gipyhApi} />
-      {renderImageList(gifUrlList)}
-    </div>
+      <div>{loading && "Loading..."}</div>
+      <div>{error && "Error"}</div>
+    </>
   );
 };
 

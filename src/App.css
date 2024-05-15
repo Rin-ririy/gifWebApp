@@ -7,21 +7,23 @@
 
 .search {
   margin-bottom: 3rem;
-  /* background-color: aqua; */
 }
 
 .list {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
   list-style: none;
+  flex-direction: row;
+  column-count: 8;
 }
 
 .item {
-  width: 10%;
+  break-inside: avoid;
 }
 
 .image {
   width: 100%;
+}
+
+input {
+  font-size: medium;
+  margin-right: 1rem;
 }
